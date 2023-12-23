@@ -97,7 +97,8 @@
 <body>
     <div class="main-container">
         <h1>GPT-4 Playground</h1>
-        <p>Description here for the user to follow/instructions.</p> 
+        <p>Define the <b>role</b> of your GPT, enter your <b>message</b>, then select the GPT-4 <b>model</b> you'd like to use. </p> 
+        <p>To upload an <b>image</b>, select GPT-4 Turbo with vision </p> 
     
         <div class="layout">
             <div class="form-container">
@@ -157,9 +158,14 @@
             })
             .then(response => response.json())
             .then(data => {
-                //console.log(data)
+                console.log(data)
                 // Append the bot's response to the conversation
-                conversationDiv.innerHTML += '<div class="bot-response">' + data.generated_text + '</div>';
+                if (!data.generated_text) {
+                    conversationDiv.innerHTML += '<div class="bot-response"> This is invalid. Please check your inputs and try again. </div>';
+                } else {
+                    conversationDiv.innerHTML += '<div class="bot-response">' + data.generated_text + '</div>'; 
+                }
+                
                 // Scroll to the bottom of the conversation
                 conversationDiv.scrollTop = conversationDiv.scrollHeight;
             });
