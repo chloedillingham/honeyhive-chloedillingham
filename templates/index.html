@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT-4 Playground</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: auto;
+        }
+        label, select, input[type=text], textarea {
+            display: block;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        textarea {
+            height: 100px;
+        }
+        input[type=submit] {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .generated-text {
+            margin-top: 20px;
+            background-color: #e9e9e9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>GPT-4 Playground</h1>
+
+    <form action="/generate" method="post">
+        <label for="role">Role:</label>
+        <input type="text" id="role" name="role" required>
+
+        <label for="user_message">User Message:</label>
+        <textarea id="user_message" name="user_message" required></textarea>
+
+        <label for="model">Select GPT Model:</label>
+        <select id="model" name="model">
+            <option value="gpt-4-1106-preview">GPT-4 1106 Preview</option>
+            <option value="gpt-4-vision-preview">GPT-4 Vision Preview</option>
+            <option value="gpt-4">GPT-4</option>
+        </select>
+
+        <input type="submit" value="Generate">
+    </form>
+
+    {% if generated_text %}
+        <div class="generated-text">
+            <h2>Generated Text:</h2>
+            <p>{{ generated_text }}</p>
+        </div>
+    {% endif %}
+</body>
+</html>
