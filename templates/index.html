@@ -59,31 +59,73 @@
         }
         .user-message { background-color: #d9edf7; }
         .bot-response { background-color: #dff0d8; }
+
+        .main-container {
+            max-width: 100%;
+            margin: auto;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .layout {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .form-container {
+            flex: 1;
+            margin-right: 20px; /* Adjust space between form and conversation */
+        }
+
+        .conversation-container {
+            flex: 2;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+            .form-container {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>GPT-4 Playground</h1>
-
-    <form id="messageForm">
-        <label for="role">Role:</label>
-        <input type="text" id="role" name="role" required>
-
-        <label for="user_message">User Message:</label>
-        <textarea id="user_message" name="user_message" required></textarea>
-
-        <label for="model">Select GPT Model:</label>
-        <select id="model" name="model">
-            <option value='gpt-4-1106-preview'>GPT-4 Turbo</option>
-            <option value='gpt-4-vision-preview'>GPT-4 Turbo with vision</option>
-            <option value='gpt-4'>GPT-4</option>
-        </form>
-        <label for="imageInput" style="display:none;">Upload Image:</label>
-        <input type="file" id="imageInput" name="image" style="display:none;"/>
-
-        <input type="submit" value="Generate">
-    </form>
-
-    <div class="conversation" id="conversation"></div>
+    <div class="main-container">
+        <h1>GPT-4 Playground</h1>
+        <p>Description here for the user to follow/instructions.</p> 
+    
+        <div class="layout">
+            <div class="form-container">
+                <form id="messageForm">
+                    <label for="role">Role:</label>
+                    <input type="text" id="role" name="role" required>
+    
+                    <label for="user_message">User Message:</label>
+                    <textarea id="user_message" name="user_message" required></textarea>
+    
+                    <label for="model">Select GPT Model:</label>
+                    <select id="model" name="model">
+                        <option value='gpt-4-1106-preview'>GPT-4 Turbo</option>
+                        <option value='gpt-4-vision-preview'>GPT-4 Turbo with vision</option>
+                        <option value='gpt-4'>GPT-4</option>
+                    </select>
+                    <label for="imageInput" style="display:none;">Upload Image:</label>
+                    <input type="file" id="imageInput" name="image" style="display:none;"/>
+    
+                    <input type="submit" value="Generate">
+                </form>
+            </div>
+            <div class="conversation-container">
+                <div class="conversation" id="conversation"></div>
+            </div>
+        </div>
+    </div>
+    
 
     <script>
         document.getElementById('messageForm').onsubmit = function(event) {
