@@ -73,10 +73,12 @@
 
         <label for="model">Select GPT Model:</label>
         <select id="model" name="model">
-            <option value='gpt-4-1106-preview'>GPT-4 1106 Preview</option>
-            <option value='gpt-4-vision-preview'>GPT-4 Vision Preview</option>
+            <option value='gpt-4-1106-preview'>GPT-4 Turbo</option>
+            <option value='gpt-4-vision-preview'>GPT-4 Turbo with vision</option>
             <option value='gpt-4'>GPT-4</option>
         </form>
+        <label for="imageInput" style="display:none;">Upload Image:</label>
+        <input type="file" id="imageInput" name="image" style="display:none;"/>
 
         <input type="submit" value="Generate">
     </form>
@@ -89,14 +91,24 @@
 
             // Get the user's message and append it to the conversation
             var userMessage = document.getElementById('user_message').value;
+            var model = document.getElementById('model').value;
             var conversationDiv = document.getElementById('conversation');
+            var imageInput = document.getElementById('imageInput');
+
             conversationDiv.innerHTML += '<div class="user-message">' + userMessage + '</div>';
             
+             // Prepare FormData for image and text
+             var formData = new FormData();
+             formData.append('message', userMessage);
+             formData.append('model', model);
+             if(model === 'gpt-4-vision-preview' && imageInput.files[0]) {
+                 formData.append('image', imageInput.files[0]);
+             }
+
             // Make an AJAX call to your API endpoint (openai-api.py)
             fetch('/generate', {
                 method: 'POST',
-                body: JSON.stringify({message: userMessage}),
-                headers: {'Content-Type': 'application/json'}
+                body: formData  // Send form data
             })
             .then(response => response.json())
             .then(data => {
@@ -110,6 +122,22 @@
             // Clear the input field for the next message
             document.getElementById('user_message').value = '';
         };
+
+        // Show image input when "GPT-4 Turbo with vision" is selected
+        document.getElementById('model').onchange = function() {
+            var model = document.getElementById('model').value;
+            var imageInput = document.getElementById('imageInput');
+            var imageInputLabel = document.querySelector('label[for="imageInput"]');
+            if(model === 'gpt-4-vision-preview') {
+                imageInput.style.display = 'block';
+                imageInputLabel.style.display = 'block';
+            } else {
+                imageInput.style.display = 'none';
+                imageInputLabel.style.display = 'none';
+            }
+        };
+
+
     </script>
 </body>
 </html>
