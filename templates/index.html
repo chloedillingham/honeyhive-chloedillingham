@@ -44,12 +44,27 @@
             padding: 20px;
             border-radius: 8px;
         }
+
+        .conversation {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .user-message, .bot-response {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+        .user-message { background-color: #d9edf7; }
+        .bot-response { background-color: #dff0d8; }
     </style>
 </head>
 <body>
     <h1>GPT-4 Playground</h1>
 
-    <form action="/generate" method="post">
+    <form id="messageForm">
         <label for="role">Role:</label>
         <input type="text" id="role" name="role" required>
 
@@ -61,16 +76,40 @@
             <option value="gpt-4-1106-preview">GPT-4 1106 Preview</option>
             <option value="gpt-4-vision-preview">GPT-4 Vision Preview</option>
             <option value="gpt-4">GPT-4</option>
-        </select>
+        </form>
 
         <input type="submit" value="Generate">
     </form>
 
-    {% if generated_text %}
-        <div class="generated-text">
-            <h2>Generated Text:</h2>
-            <p>{{ generated_text }}</p>
-        </div>
-    {% endif %}
+    <div class="conversation" id="conversation"></div>
+
+    <script>
+        document.getElementById('messageForm').onsubmit = function(event) {
+            event.preventDefault(); // Prevent page refresh
+
+            // Get the user's message and append it to the conversation
+            var userMessage = document.getElementById('user_message').value;
+            var conversationDiv = document.getElementById('conversation');
+            conversationDiv.innerHTML += '<div class="user-message">' + userMessage + '</div>';
+            
+            // Make an AJAX call to your API endpoint (openai-api.py)
+            fetch('/generate', {
+                method: 'POST',
+                body: JSON.stringify({message: userMessage}),
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                // Append the bot's response to the conversation
+                conversationDiv.innerHTML += '<div class="bot-response">' + data.generated_text + '</div>';
+                // Scroll to the bottom of the conversation
+                conversationDiv.scrollTop = conversationDiv.scrollHeight;
+            });
+            
+            // Clear the input field for the next message
+            document.getElementById('user_message').value = '';
+        };
+    </script>
 </body>
 </html>
