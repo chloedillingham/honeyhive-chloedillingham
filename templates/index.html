@@ -108,7 +108,7 @@
                  formData.append('image', imageInput.files[0]);
              }
 
-            // Make an AJAX call to your API endpoint (openai-api.py)
+            // Make an AJAX call to API endpoint (openai-api.py)
             fetch('/generate', {
                 method: 'POST',
                 body: formData  // Send form data
@@ -170,7 +170,38 @@
 
                 // Replace the input field with the new message span
                 messageSpan.innerHTML = '<span class="message-content">' + newMessage + '</span>';
+
+                // Call updateConversation to handle the updated message
+                updateConversation(newMessage, messageDiv);
             }
+        }
+
+        function updateConversation(updatedMessage, messageDiv) {
+            var model = document.getElementById('model').value; // Assuming the model remains the same
+            var formData = new FormData();
+            formData.append('message', updatedMessage);
+            formData.append('model', model);
+
+            console.log("updateConversation formData", formData)
+        
+            fetch('/generate', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Find the next sibling bot-response div and update its content
+                var botResponseDiv = messageDiv.nextElementSibling;
+                if(botResponseDiv && botResponseDiv.classList.contains('bot-response')) {
+                    botResponseDiv.innerHTML = data.generated_text;
+                } else {
+                    // If there's no bot-response next to this message, append a new one.
+                    messageDiv.insertAdjacentHTML('afterend', '<div class="bot-response">' + data.generated_text + '</div>');
+                }
+                // Scroll to the updated part of the conversation
+                var conversationDiv = document.getElementById('conversation');
+                conversationDiv.scrollTop = conversationDiv.scrollHeight;
+            });
         }
 
 
