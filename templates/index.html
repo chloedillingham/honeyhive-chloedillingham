@@ -95,7 +95,10 @@
             var conversationDiv = document.getElementById('conversation');
             var imageInput = document.getElementById('imageInput');
 
-            conversationDiv.innerHTML += '<div class="user-message">' + userMessage + '</div>';
+            conversationDiv.innerHTML += '<div class="user-message">' +
+                '<span class="message-content">' + userMessage + '</span>' +
+                '<br><button onclick="handleEditButtonClick(event)" class="edit-button" type="button">Edit Message</button>' +
+                '</div>';
             
              // Prepare FormData for image and text
              var formData = new FormData();
@@ -136,6 +139,19 @@
                 imageInputLabel.style.display = 'none';
             }
         };
+
+        // Function to handle the click event for the edit button
+        function handleEditButtonClick(event) {
+            // Your logic for handling the edit button click here
+            var messageDiv = event.currentTarget.closest('.user-message');
+            // Within that parent, find the span with the message content
+            var messageSpan = messageDiv.querySelector('.message-content');
+            var userMessage = messageSpan.textContent;  // Get the text content of the span
+            console.log('User message:', userMessage);
+            alert(userMessage);
+        }
+
+        
 
 
     </script>
