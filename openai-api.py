@@ -29,7 +29,7 @@ def generate():
 
     # Retrieve the user message and model from the request
     user_message = data['message']
-    model = data.get('model', 'text-davinci-003')  # Default to a specific model
+    model = data.get('model', 'gpt-4')  # Default to a specific model
 
     # Initialize conversation history if it doesn't exist
     if 'conversation' not in session:
@@ -41,7 +41,7 @@ def generate():
     # Call the OpenAI API
     try:
         response = client.chat.completions.create(
-            model='gpt-4',
+            model=model,
             messages=session['conversation']
         )
     except APIError as e:
