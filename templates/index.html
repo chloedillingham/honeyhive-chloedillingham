@@ -142,14 +142,37 @@
 
         // Function to handle the click event for the edit button
         function handleEditButtonClick(event) {
-            // Your logic for handling the edit button click here
             var messageDiv = event.currentTarget.closest('.user-message');
-            // Within that parent, find the span with the message content
+            // Find the span with the message content
             var messageSpan = messageDiv.querySelector('.message-content');
             var userMessage = messageSpan.textContent;  // Get the text content of the span
-            console.log('User message:', userMessage);
-            alert(userMessage);
+
+            // Replace the span with an input field, pre-filled with the current message
+            var input = '<input type="text" class="edit-input" value="' + userMessage + '">';
+            messageSpan.innerHTML = input;
+
+            // Focus the input field and select its content
+            var editInput = messageSpan.querySelector('.edit-input');
+            editInput.focus();
+            editInput.select();
+
+            // Handle saving the new message on Enter key press or when input loses focus
+            editInput.onblur = saveEditedMessage;
+            editInput.onkeypress = function(event) {
+                if (event.key === "Enter") {
+                    saveEditedMessage.call(editInput);
+                }
+            };
+
+            function saveEditedMessage() {
+                // Get the new message from the input field
+                var newMessage = this.value;
+
+                // Replace the input field with the new message span
+                messageSpan.innerHTML = '<span class="message-content">' + newMessage + '</span>';
+            }
         }
+
 
         
 
