@@ -120,6 +120,7 @@
     
                     <input type="submit" value="Generate">
                 </form>
+                <button id="nextChunk" style="display:none;">Stream next chunk...</button>
             </div>
             <div class="conversation-container">
                 <div class="conversation" id="conversation"></div>
@@ -147,7 +148,12 @@
              var formData = new FormData();
              formData.append('message', userMessage);
              formData.append('model', model);
-             formData.append('stream', document.getElementById('stream').checked ? "True" : "False")
+             // Determine if the stream checkbox is checked
+            var streamChecked = document.getElementById('stream').checked;
+            formData.append('stream', streamChecked ? "True" : "False");
+
+            // Show the Next button if stream is checked
+            document.getElementById('nextChunk').style.display = streamChecked ? "inline" : "none";
              if(model === 'gpt-4-vision-preview' && imageInput.files[0]) {
                  formData.append('image', imageInput.files[0]);
              }
@@ -161,10 +167,16 @@
             .then(data => {
                 console.log(data)
                 // Append the bot's response to the conversation
-                if (!data.generated_text) {
-                    conversationDiv.innerHTML += '<div class="bot-response"> This is invalid. Please check your inputs and try again. </div>';
+                if (document.getElementById('stream').checked && data.chunks && data.chunks.length) {
+                    // Initialize the conversation with the first chunk and show the next button
+                    updateConversationWithChunks(data.chunks);
                 } else {
-                    conversationDiv.innerHTML += '<div class="bot-response">' + data.generated_text + '</div>'; 
+                    // If stream is not checked or no chunks are provided, display the full response
+                    if (!data.generated_text) {
+                        conversationDiv.innerHTML += '<div class="bot-response">This is invalid. Please check your inputs and try again.</div>';
+                    } else {
+                        conversationDiv.innerHTML += '<div class="bot-response">' + data.generated_text + '</div>';
+                    }
                 }
                 
                 // Scroll to the bottom of the conversation
@@ -197,6 +209,42 @@
                 document.getElementById('messageForm').style.backgroundColor = "#fff";
             }
         };
+
+        // Function to handle updating the conversation with new chunks
+        function updateConversationWithChunks(chunks) {
+            let currentChunkIndex = 0;
+            const conversationDiv = document.getElementById('conversation');
+            const nextButton = document.getElementById('nextChunk');
+        
+            function displayNextChunk() {
+                if (currentChunkIndex < chunks.length-1) {
+                    let chunk = chunks[currentChunkIndex];
+                    let previousChunk = chunks[currentChunkIndex - 1] || '';
+            
+                    // Determine if a space should be added before the chunk
+                    let addSpace = true;
+                    if (chunk.match(/^[\.,!?;:\)\]\}]/) || previousChunk.match(/[\(\[\{]$/)) {
+                        addSpace = false;
+                    }
+            
+                    // Append the chunk to the conversation with or without a preceding space
+                    conversationDiv.innerHTML += (addSpace && currentChunkIndex > 0 ? ' ' : '') + chunk;
+            
+                    currentChunkIndex++; // Increment the index for the next chunk
+                }
+                // Hide the button if there are no more chunks
+                if (currentChunkIndex >= chunks.length-1) {
+                    nextButton.style.display = 'none';
+                }
+            }
+        
+            // Initially display the first chunk
+            displayNextChunk();
+        
+            // Attach the event listener to the Next button
+            nextButton.onclick = displayNextChunk;
+        }
+        
 
         // Function to handle the click event for the edit button
         function handleEditButtonClick(event) {
