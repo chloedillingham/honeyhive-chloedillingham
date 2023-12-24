@@ -97,14 +97,14 @@
 <body>
     <div class="main-container">
         <h1>GPT-4 Playground</h1>
-        <p>Define the <b>role</b> of your GPT, enter your <b>message</b>, then select the GPT-4 <b>model</b> you'd like to use. </p> 
+        <p>Decide if you want to <b>stream</b> responses, enter your <b>message</b>, then select the GPT-4 <b>model</b> you'd like to use. </p> 
         <p>To upload an <b>image</b>, select GPT-4 Turbo with vision </p> 
     
         <div class="layout">
             <div class="form-container">
                 <form id="messageForm">
-                    <label for="role">Role:</label>
-                    <input type="text" id="role" name="role" required>
+                    <label for="stream">Stream Mode:</label>
+                <input type="checkbox" id="stream" name="stream">
     
                     <label for="user_message">User Message:</label>
                     <textarea id="user_message" name="user_message" required></textarea>
@@ -147,6 +147,7 @@
              var formData = new FormData();
              formData.append('message', userMessage);
              formData.append('model', model);
+             formData.append('stream', document.getElementById('stream').checked ? "True" : "False")
              if(model === 'gpt-4-vision-preview' && imageInput.files[0]) {
                  formData.append('image', imageInput.files[0]);
              }
@@ -188,6 +189,15 @@
             }
         };
 
+        document.getElementById('stream').onchange = function() {
+            var streamValue = document.getElementById('stream').checked ? "True" : "False";
+            if (streamValue == "True") {
+                document.getElementById('messageForm').style.backgroundColor = "#9fc5e8";
+            } else {
+                document.getElementById('messageForm').style.backgroundColor = "#fff";
+            }
+        };
+
         // Function to handle the click event for the edit button
         function handleEditButtonClick(event) {
             var messageDiv = event.currentTarget.closest('.user-message');
@@ -225,10 +235,12 @@
         }
 
         function updateConversation(updatedMessage, messageDiv) {
-            var model = document.getElementById('model').value; // Assuming the model remains the same
+            var model = document.getElementById('model').value;
+            var streamValue = document.getElementById('stream').checked ? "True" : "False";
             var formData = new FormData();
             formData.append('message', updatedMessage);
             formData.append('model', model);
+            formData.append('stream', streamValue);
 
             console.log("updateConversation formData", formData)
         

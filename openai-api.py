@@ -29,6 +29,10 @@ def index():
 def generate():
     user_message = request.form['message']
     model = request.form['model']
+    if request.form['stream'] == "True":
+        stream = True
+    else:
+        stream = False
 
     # Initialize conversation history if it doesn't exist
     if 'conversation' not in session:
@@ -54,6 +58,7 @@ def generate():
     try:
         response = client.chat.completions.create(
             model=model,
+            stream=stream,
             messages=messages_payload,
             max_tokens=300
         )
@@ -62,13 +67,24 @@ def generate():
         return jsonify({'error': str(e)})
 
     # Extract the generated text
-    generated_text = response.choices[0].message.content
+    if stream:
+        chunks = []
+        for chunk in response:
+            chunk_content = chunk.choices[0].delta.content
+            if chunk_content is not "":
+                # print(chunk_content)
+                # print("****************")
+                chunks.append(chunk_content)
+        generated_text = "streamed"
+    else:
+        generated_text = response.choices[0].message.content
+        chunks = None
 
     # Append the bot's response to the conversation
     session['conversation'].append({"role": "assistant", "content": generated_text})
 
     # Return the generated text as JSON
-    return jsonify({'generated_text': generated_text})
+    return jsonify({'generated_text': generated_text, 'chunks': chunks})
 
 if __name__ == '__main__':
     app.run(debug=True)
