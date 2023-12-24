@@ -192,12 +192,20 @@
             var model = document.getElementById('model').value;
             var imageInput = document.getElementById('imageInput');
             var imageInputLabel = document.querySelector('label[for="imageInput"]');
+            var streamCheckbox = document.getElementById('stream'); 
+            var streamCheckboxLabel = document.querySelector('label[for="stream"]');
             if(model === 'gpt-4-vision-preview') {
                 imageInput.style.display = 'block';
                 imageInputLabel.style.display = 'block';
+                // hide stream mode
+                streamCheckbox.style.display = 'none';
+                streamCheckboxLabel.style.display = 'none';
             } else {
                 imageInput.style.display = 'none';
                 imageInputLabel.style.display = 'none';
+                // show stream mode
+                streamCheckbox.style.display = 'inline-block';
+                streamCheckboxLabel.style.display = 'block';
             }
         };
 
