@@ -211,15 +211,17 @@
         };
 
         // Function to handle updating the conversation with new chunks
-        function updateConversationWithChunks(chunks) {
+        function updateConversationWithChunks(chunks, botResponseDiv) {
             let currentChunkIndex = 0;
             const conversationDiv = document.getElementById('conversation');
             const nextButton = document.getElementById('nextChunk');
         
-            // Create a new div for the chunks with the same style as bot-response
-            let botResponseDiv = document.createElement('div');
-            botResponseDiv.classList.add('bot-response');
-            conversationDiv.appendChild(botResponseDiv);
+            // If botResponseDiv is not provided, create a new one
+            if (!botResponseDiv) {
+                botResponseDiv = document.createElement('div');
+                botResponseDiv.classList.add('bot-response');
+                conversationDiv.appendChild(botResponseDiv);
+            }
         
             function displayNextChunk() {
                 if (currentChunkIndex < chunks.length-1) {
@@ -301,8 +303,8 @@
             formData.append('message', updatedMessage);
             formData.append('model', model);
             formData.append('stream', streamValue);
-
-            console.log("updateConversation formData", formData)
+        
+            console.log("updateConversation formData", formData);
         
             fetch('/generate', {
                 method: 'POST',
@@ -310,19 +312,33 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Find the next sibling bot-response div and update its content
                 var botResponseDiv = messageDiv.nextElementSibling;
-                if(botResponseDiv && botResponseDiv.classList.contains('bot-response')) {
-                    botResponseDiv.innerHTML = data.generated_text;
+                if (document.getElementById('stream').checked && data.chunks && data.chunks.length) {
+                    // If there's a bot-response next to this message, clear it for chunks
+                    if(botResponseDiv && botResponseDiv.classList.contains('bot-response')) {
+                        botResponseDiv.innerHTML = '';
+                    } else {
+                        // If there's no bot-response next to this message, create a new one for chunks
+                        botResponseDiv = document.createElement('div');
+                        botResponseDiv.classList.add('bot-response');
+                        messageDiv.insertAdjacentElement('afterend', botResponseDiv);
+                    }
+                    // Update the conversation with the first chunk and show the next button
+                    updateConversationWithChunks(data.chunks, botResponseDiv);
                 } else {
-                    // If there's no bot-response next to this message, append a new one.
-                    messageDiv.insertAdjacentHTML('afterend', '<div class="bot-response">' + data.generated_text + '</div>');
+                    // If stream is not checked or no chunks are provided, update the response normally
+                    if (!data.generated_text) {
+                        botResponseDiv.innerHTML = 'This is invalid. Please check your inputs and try again.';
+                    } else {
+                        botResponseDiv.innerHTML = data.generated_text;
+                    }
                 }
                 // Scroll to the updated part of the conversation
                 var conversationDiv = document.getElementById('conversation');
                 conversationDiv.scrollTop = conversationDiv.scrollHeight;
             });
         }
+        
 
 
         
