@@ -71,7 +71,7 @@ def generate():
         chunks = []
         for chunk in response:
             chunk_content = chunk.choices[0].delta.content
-            if chunk_content is not "":
+            if chunk_content != "":
                 chunks.append(chunk_content)
         generated_text = "streamed"
     else:
