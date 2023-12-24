@@ -167,7 +167,7 @@
             .then(data => {
                 console.log(data)
                 // Append the bot's response to the conversation
-                if (document.getElementById('stream').checked && data.chunks && data.chunks.length) {
+                if (document.getElementById('stream').checked && data.chunks && data.chunks.length-1) {
                     // Initialize the conversation with the first chunk and show the next button
                     updateConversationWithChunks(data.chunks);
                 } else {
@@ -216,20 +216,25 @@
             const conversationDiv = document.getElementById('conversation');
             const nextButton = document.getElementById('nextChunk');
         
+            // Create a new div for the chunks with the same style as bot-response
+            let botResponseDiv = document.createElement('div');
+            botResponseDiv.classList.add('bot-response');
+            conversationDiv.appendChild(botResponseDiv);
+        
             function displayNextChunk() {
                 if (currentChunkIndex < chunks.length-1) {
                     let chunk = chunks[currentChunkIndex];
                     let previousChunk = chunks[currentChunkIndex - 1] || '';
-            
+        
                     // Determine if a space should be added before the chunk
                     let addSpace = true;
                     if (chunk.match(/^[\.,!?;:\)\]\}]/) || previousChunk.match(/[\(\[\{]$/)) {
                         addSpace = false;
                     }
-            
-                    // Append the chunk to the conversation with or without a preceding space
-                    conversationDiv.innerHTML += (addSpace && currentChunkIndex > 0 ? ' ' : '') + chunk;
-            
+        
+                    // Append the chunk to the botResponseDiv with or without a preceding space
+                    botResponseDiv.innerHTML += (addSpace && currentChunkIndex > 0 ? ' ' : '') + chunk;
+        
                     currentChunkIndex++; // Increment the index for the next chunk
                 }
                 // Hide the button if there are no more chunks
@@ -238,12 +243,19 @@
                 }
             }
         
-            // Initially display the first chunk
+            // Initially display the first chunk and show the next button if there are more chunks
             displayNextChunk();
+            if (currentChunkIndex < chunks.length-1) {
+                nextButton.style.display = 'inline';
+            } else {
+                nextButton.style.display = 'none';
+            }
         
             // Attach the event listener to the Next button
             nextButton.onclick = displayNextChunk;
         }
+        
+        
         
 
         // Function to handle the click event for the edit button
